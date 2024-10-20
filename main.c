@@ -1,3 +1,5 @@
+
+
 #include "MemMap.h"
 #include "StdTypes.h"
 
@@ -22,20 +24,20 @@ int main(void)
 
 	DIO_Init();
 	LCD_Init();
- 	KEYPAD_Init();
- 	ACD_Init();
-    FILTER_Init();
+	KEYPAD_Init();
+	ACD_Init();
+	FILTER_Init();
 	
 
-u16 Temp =0 ,Smoke=0;
-u8 ClearLCDNormal=0 , ClearLCDHeat=0 ,  ClearLCDFire=0 ;
-u8 NoEnterHeat=0,NoEnterNormal=0 ,NoEnterFire=0;
-u8 k=No_KEY, pass=0 ,password=123,passwordCheck=0;
+	u16 Temp =0 ,Smoke=0;
+	u8 ClearLCDNormal=0 , ClearLCDHeat=0 ,  ClearLCDFire=0 ;
+	u8 NoEnterHeat=0,NoEnterNormal=0 ,NoEnterFire=0;
+	u8 k=No_KEY, pass=0 ,password=123,passwordCheck=0;
 
 
-while(1)
-{
-	     k = KEYPAD_GetKey();
+	while(1)
+	{
+
 		Temp=LM35_GetRead();
 		Smoke=POT_GetRead();
 		
@@ -59,10 +61,10 @@ while(1)
 			if(ClearLCDFire==0){
 				LCD_Clear();
 				ClearLCDFire=1;
-			    FIREState_Runnable();
+				FIREState_Runnable();
 			}
 			passwordCheck=1;
-			  
+			
 		}
 		
 		// Heat_State
@@ -70,53 +72,50 @@ while(1)
 			if(ClearLCDHeat==0){
 				LCD_Clear();
 				ClearLCDHeat=1;
-			}			
+			}
 			HeatState_Runnable(Temp,Smoke);
 			NoEnterNormal=0;
 			ClearLCDNormal=0;
 			ClearLCDFire=0;
-			NoEnterFire=0;	
-		}
-		else{
-			// No_Action
-		}
-		// Password_Check
-		if(passwordCheck==1){
-			  if (k>='0' && k<='9'){
-				  LCD_WriteChar(k);
-				  pass= pass*10 +k - '0';
-			  }
-			  else if(k=='='){
-				  if(pass==password){
-					  NoEnterFire=1;
-					  NoEnterHeat=0; //no enter Heat State
-					  NoEnterNormal=0; //no enter Normal State
-					  ClearLCDHeat=0;
-					  ClearLCDNormal=0;
-					  Smoke=0;
-					  Temp=0;
-					  passwordCheck=0;
-					  k=No_KEY;
-					  }else{
-					  passwordCheck=1;	  
-					  pass=0;
-					  NoEnterFire=0;
-					  ClearLCDFire=0;
-					  LCD_Clear();
-					  LCD_SetCursor(line_1,5);
-					  LCD_WriteString((u8*)"Fire!!");
-					  LCD_SetCursor(line_2,0);
-					  LCD_WriteString((u8*)"PassWord=");
-				  }
-			  }else{
-				  pass=pass;
-			  }
-			  
-		}else{
-			// No_Action
+			NoEnterFire=0;
 		}
 		
-		}
+		// Password_Check
+		while(passwordCheck){
+			k = KEYPAD_GetKey();
+			if (k>='0' && k<='9'){
+				LCD_WriteChar(k);
+				pass= pass*10 +k - '0';
+			}
+			else if(k=='='){
+				if(pass==password){
+					NoEnterFire=1;
+					NoEnterHeat=0; //no enter Heat State
+					NoEnterNormal=0; //no enter Normal State
+					ClearLCDHeat=0;
+					ClearLCDNormal=0;
+					Smoke=0;
+					Temp=0;
+					k=No_KEY;
+					passwordCheck=0;
+					}else{
+					passwordCheck=1;
+					pass=0;
+					NoEnterFire=0;
+					ClearLCDFire=0;
+					LCD_Clear();
+					LCD_SetCursor(line_1,5);
+					LCD_WriteString((u8*)"Fire!!");
+					LCD_SetCursor(line_2,0);
+					LCD_WriteString((u8*)"PassWord=");
+				}
+				}else{
+				pass=pass;
+			}
+			
+ 			}
+		
+	}
 }
 
 
